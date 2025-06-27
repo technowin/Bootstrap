@@ -965,7 +965,7 @@ def form_master(request):
                 else:
                     reference_type = '0'
                     new_data_id = form_data_id
-                if step_id == '1' or step_id == '6' or readonlyWF=='1':
+                if step_id == '1' or step_id == '6' or readonlyWF == '1':
                     version_no = 1.0
                 else:
                     version_no = get_object_or_404(WorkflowVersion, req_id=req_num).version
@@ -1254,8 +1254,6 @@ def common_form_post(request):
                 else:
                     already_exists = False
                          
-
-
                 FormFieldValues.objects.create(
                     form_data=form_data,form=form, field=field, value=input_value, created_by=created_by
                 )
@@ -1297,9 +1295,9 @@ def common_form_post(request):
                             except FormField.DoesNotExist:
                                 pass  
 
-                if already_exists is not True and field.field_type == 'field_dropdown':
-                    handle_uploaded_files(request, form_name, created_by, form_data, user)
-                    file_name = handle_generative_fields(form, form_data, created_by)
+        if already_exists is not True:
+            handle_uploaded_files(request, form_name, created_by, form_data, user)
+            file_name = handle_generative_fields(form, form_data, created_by)
 
         # callproc('create_dynamic_form_views')
         messages.success(request, "Form data saved successfully!") 
@@ -1562,6 +1560,7 @@ def common_form_edit(request):
                     input_value = request.POST.get(f"field_{field_id}", "").strip()
 
                 if field.field_type == "generative":
+                    file_name = get_object_or_404(FormFieldValues, form_data_id=form_data, field_id=field).value
                     continue
 
                 if field.field_type in ['file', 'file multiple']:
@@ -1584,8 +1583,8 @@ def common_form_edit(request):
                         )
 
             
-        handle_uploaded_files(request, form_name, created_by, form_data, user)
-        file_name = get_object_or_404(FormFieldValues, form_data_id=form_data, field_id=field).value
+        handle_uploaded_files(request, form_name, created_by, form_data, user)        
+        # file_name = get_object_or_404(FormFieldValues, form_data_id=form_data, field_id=field).value
                     
         # Run only if type is reference
         if type == 'reference' or reference_type =='1':
