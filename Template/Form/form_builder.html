@@ -36,20 +36,30 @@
 
 <style>
 
-/* Custom column widths (based on 12-column layout but adjustable) */
-.col-md-custom-05 { flex: 0 0 5.33%; max-width: 5.33%; padding: 0 15px; }
-.col-md-custom-1 { flex: 0 0 5%; max-width: 4%; padding: 0 15px; }
-.col-md-custom-2 { flex: 0 0 12%; max-width: 12%; padding: 0 15px; }
-.col-md-custom-3 { flex: 0 0 25%; max-width: 25%; padding: 0 15px; }
-.col-md-custom-4 { flex: 0 0 33.33%; max-width: 33.33%; padding: 0 15px; }
-.col-md-custom-5 { flex: 0 0 41.66%; max-width: 41.66%; padding: 0 15px; }
-.col-md-custom-6 { flex: 0 0 50%; max-width: 50%; padding: 0 15px; }
-.col-md-custom-7 { flex: 0 0 58.33%; max-width: 58.33%; padding: 0 15px; }
-.col-md-custom-8 { flex: 0 0 66.66%; max-width: 66.66%; padding: 0 15px; }
-.col-md-custom-9 { flex: 0 0 75%; max-width: 75%; padding: 0 15px; }
-.col-md-custom-10 { flex: 0 0 83.33%; max-width: 83.33%; padding: 0 15px; }
-.col-md-custom-11 { flex: 0 0 91.66%; max-width: 91.66%; padding: 0 15px; }
-.col-md-custom-12 { flex: 0 0 100%; max-width: 100%; padding: 0 15px; }
+    /* Base: Mobile-first default (stacked full width on small screens) */
+[class^="col-md-custom-"],
+[class*=" col-md-custom-"] {
+  flex: 0 0 100%;
+  max-width: 100%;
+  padding: 0 10px;
+}
+
+/* Tablet and up (≥ 768px) */
+@media (min-width: 768px) {
+  .col-md-custom-0 { flex: 0 0 3.33%; max-width: 3.33%; }
+  .col-md-custom-1   { flex: 0 0 4%;    max-width: 4%; }
+  .col-md-custom-2   { flex: 0 0 15%;   max-width: 15%; }
+  .col-md-custom-3   { flex: 0 0 25%;   max-width: 25%; }
+  .col-md-custom-4   { flex: 0 0 28.33%; max-width: 28.33%; }
+  .col-md-custom-5   { flex: 0 0 41.66%; max-width: 41.66%; }
+  .col-md-custom-6   { flex: 0 0 50%;   max-width: 50%; }
+  .col-md-custom-7   { flex: 0 0 58.33%; max-width: 58.33%; }
+  .col-md-custom-8   { flex: 0 0 66.66%; max-width: 66.66%; }
+  .col-md-custom-9   { flex: 0 0 75%;   max-width: 75%; }
+  .col-md-custom-10  { flex: 0 0 83.33%; max-width: 83.33%; }
+  .col-md-custom-11  { flex: 0 0 91.66%; max-width: 91.66%; }
+  .col-md-custom-12  { flex: 0 0 100%;  max-width: 100%; }
+}
 
 
 
@@ -480,7 +490,7 @@
             
     
         
-            let colSize = 'col-md-3';
+            let colSize = 'col-md-custom-4';
 
             let labelInputHtml = '';
             if (field.type === "file_name") {
@@ -500,14 +510,15 @@
 
 
           builder.innerHTML += `
-            <div class="row col-md-12 draggable-field" data-id="${fieldId}">
-                <div class="col-md-custom-1 drag-handle" style="cursor: grab;">
-                    &#x2630;
+           <div class="row col-md-12 draggable-field" data-id="${fieldId}">
+                <div class="col-md-custom-0 drag-handle" style="cursor: grab;">
+                     <span class="btn btn-primary rounded-pill" style=><i class="fa fa-sort me-1"></i> </span>
                 </div>
-                <div class="col-md-custom-2 mb-3">
+
+                <div class="col-md-2 mb-3">
                     ${labelInputHtml}
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-custom-2 mb-3">
                     ${dropdownHtml}
                 </div>
                 <div class="col-md-2 mb-3">
@@ -519,7 +530,7 @@
                 <div class="${colSize} mb-3">
                     ${subControlHtml || optionDropdownHtml }
                 </div>
-                <div class="col-md-1 mt-2">
+                <div class="col-md-custom-0 mt-2">
                     <span onclick="removeField(${fieldId})" style="cursor: pointer;">
                         <i class="fa-solid fa-trash" style="color: #dc3545; font-size: 1.5rem;"></i>
                     </span>
