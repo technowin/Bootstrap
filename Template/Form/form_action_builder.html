@@ -1,93 +1,116 @@
-{% extends "Shared/Layout.html" %} {% block username %}{{username}}{% endblock %}
-{% block content %}
+{% extends "bootstrap/vertical_base.html" %}
 {% load static %}
-{% csrf_token %}
 
- <!-- Custom styles for this html-->
- <link href="{% static 'css/masters.css' %}" rel="stylesheet" type="text/css" >
- <link href="{% static 'css/table.css' %}" rel="stylesheet" type="text/css" >
- <link href="{% static 'css/activebtn.css' %}" rel="stylesheet" type="text/css" >
+{% block title %}Search{% endblock title %}
 
- <link rel="stylesheet" type="text/css" href="{% static 'css/tooltips.css' %}" />
+{% block extra_css %}
+<!-- Select2 css -->
+<link href="{% static 'css/vendor/select2.min.css' %}" rel="stylesheet" type="text/css" />
+<!-- Daterangepicker css -->
+<link href="{% static 'css/vendor/daterangepicker.css' %}" rel="stylesheet" type="text/css" />
+<!-- Bootstrap Touchspin css -->
+<link href="{% static 'css/vendor/jquery.bootstrap-touchspin.min.css' %}" rel="stylesheet" type="text/css" />
+<!-- Flatpickr Timepicker css -->
+<link href="{% static 'css/vendor/flatpickr.min.css' %}" rel="stylesheet" type="text/css" />
+<!-- Bootstrap Datepicker css -->
+<link href="{% static 'css/vendor/bootstrap-datepicker.min.css' %}" rel="stylesheet" type="text/css" />
+<!-- Bootstrap Timepicker css -->
+<link href="{% static 'css/vendor/bootstrap-timepicker.min.css' %}" rel="stylesheet" type="text/css" />
 
- <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
- <!-- Include DataTables CSS -->
- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
- <!-- Include DataTables JS -->
- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
- <!-- Selectize.js CSS -->
-{% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap3.min.css"> {% endcomment %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<link href="{% static 'css/inputs.css' %}" rel="stylesheet" type="text/css" >
+
+<!-- Selectize.js CSS -->
 <link href="{% static 'css/selectize.min.css' %}" rel="stylesheet" type="text/css" >
-<!-- Selectize.js JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+<link href="{% static 'css/form_builder.css' %}" rel="stylesheet" type="text/css" >
+{% endblock %}
 
+{% block page_title %}
+    {% include "bootstrap/partials/page-title.html" with page_title='Search' sub_title='' %}
+{% endblock %}
 
-<div class="mt-4">
-    <form method="POST" action="{% if form %}{% url 'update_action_form' form.id %}{% else %}{% url 'save_form_action' %}{% endif %}" class="row col-md-12" id="main-form"
-            style="padding: 20px; border: 2px solid #b3b3b3; border-radius: 15px;display: flex; justify-content: center; align-items: center;">
-        {% csrf_token %}
-        <div class="col-md-3">
-            <label>Form Action Name:</label>
-            <input type="text" placeholder="Enter Action Template Name" class="form-control" name="action_name" value="{{ form.name }}" required>
-        </div>
+{% block content %}
 
-        <div class="col-md-3">
-            <label>Master Actions</label>
-                <select name="action_master" id="dropdown" class="form-control" >
-                    <option value="" Selected>Select</option>
-                    {% for item in master_values %}
-                        <option value="{{ item.id }}">{{ item.name }}</option>
-                    {% endfor %}
-                </select>
-        </div>
+<div class="row">
+    <div class="col-12">
+        <!-- Card 1: Form Inputs + Add Field -->
+        <div class="card shadow mb-4" style="border-radius: 15px;">
+            <div class="card-body">
+                <form method="POST"
+                    action="{% if form %}{% url 'update_action_form' form.id %}{% else %}{% url 'save_form_action' %}{% endif %}"
+                    id="main-form"
+                    style="padding: 20px;">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Form Action Name:</label>
+                            <input type="text" placeholder="Enter Action Template Name" class="form-control"
+                                name="action_name" value="{{ form.name }}" required>
+                        </div>
 
-        <div class="col-md-2">
-            <label for="add_into_master">Add to Master</label><br>
-            <label class="switch">
-                <input type="checkbox" name="is_master" id="add_into_master" {% if form.is_master == True %}checked{% endif %}>
-                <span class="slider"></span>
-            </label>
-        </div>
-        
-        
+                        <div class="col-md-3">
+                            <label>Master Actions</label>
+                            <select name="action_master" id="dropdown" class="form-control">
+                                <option value="">Select</option>
+                                {% for item in master_values %}
+                                    <option value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
+                        <div class="col-md-2 d-flex align-items-center justify-content-center">
+                            <div>
+                                <label for="add_into_master">Add to Master</label><br>
+                                <label class="switch">
+                                    <input type="checkbox" name="is_master" id="add_into_master"
+                                        {% if form.is_master == True %}checked{% endif %}>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
 
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                {% if form %}Update{% else %}Save{% endif %} Form
+                            </button>
+                        </div>
+                    </div>
 
-        <input type="hidden" name="form_data" id="form-data-input">
+                    <input type="hidden" name="form_data" id="form-data-input">
+                </form>
 
-        <div class="col-md-2 mt-3">
-            <button type="submit" class="btn btn-primary mt-3">{% if form %}Update {% else %}Save {% endif %}Form</button>
-        </div>
+                <hr>
 
+                <div class="text-center mb-3">
+                    <h5 class="fw-bold text-dark">
+                        {% if form %}Edit{% else %}Create{% endif %} Form Footer
+                        <button class="btn btn-primary ms-3" onclick="addField(event)">Add Field</button>
+                    </h5>
+                </div>
 
-    </form>
-
-    <br>
-    <div class="row" style="padding: 20px; border: 2px solid #b3b3b3; border-radius: 15px;">
-        <div class="col-md-12">
-            <div class="card shadow" style="border: 2px solid #b3b3b3; border-radius: 15px;">
-                <h2 style="text-align:center; font-weight:600; color:black">
-                    {% if form %} Edit {% else %}Create {% endif %}Form Footer &nbsp;&nbsp;&nbsp;
-                    <button class="btn btn-primary" onclick="addField(event)">Add Field</button>
-                </h2>
-                <br>
-                <div id="form-builder" class="col-md-12" ></div>
+                <div id="form-builder" class="col-12"></div>
             </div>
         </div>
-    </div>
-        <div class="row" style="padding: 20px; border: 2px solid #b3b3b3; border-radius: 15px;">
-        <div class="col-md-12">
-            <div class="card shadow" style="border: 2px solid #b3b3b3; border-radius: 15px;">
-                <h2 style="text-align:center; font-weight:600; color:black">Live Preview</h2>
-                <div id="dynamic-form" class="row col-md-12" style="display: flex; justify-content: center; align-items: center;">
+
+        <!-- Card 2: Live Preview -->
+        <div class="card shadow" style="border-radius: 15px;">
+            <div class="card-body">
+                <h5 class="text-center fw-bold text-dark mb-4">Live Preview</h5>
+                <div id="dynamic-form" class="row justify-content-center align-items-center">
+                    <!-- Live preview content will appear here -->
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script src="{% static 'js/selectize.min.js' %}"></script>
 
 <script>
 
@@ -120,6 +143,8 @@
 </script> 
 
 <script>
+
+    
 
 
 let dropdownOptions = JSON.parse('{{ dropdown_options|escapejs|safe }}');
@@ -380,3 +405,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
   {% endblock %}
+
+{% block extra_javascript %}
+
+{% include "bootstrap/partials/syntax-highlight.html" %}
+
+<!-- Third party js -->
+<script src="{% static 'js/vendor/handlebars.min.js' %}"></script>
+<script src="{% static 'js/vendor/typeahead.bundle.min.js' %}"></script>
+    <script src="{% static 'js/vendor/bootstrap-timepicker.min.js' %}"></script>
+<!-- Third party js ends -->
+
+<script src="{% static 'js/vendor/flatpickr.min.js' %}"></script>
+
+<!-- Init js -->
+<script src="{% static 'js/pages/demo.typehead.js' %}"></script>
+<script src="{% static 'js/pages/demo.timepicker.js' %}"></script>
+<!-- Init js end -->
+
+<!-- Selectize.js JS -->
+<script src="{% static 'js/selectize.min.js' %}"></script>
+
+{% endblock %}

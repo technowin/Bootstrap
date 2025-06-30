@@ -210,3 +210,16 @@ sudo service nginx restart
 sudo service gunicorn restart
 sudo curl -s https://lknconsultants.net/bulk_mail
 curl -s http://15.207.169.98/ocr_files
+
+
+How to remove .pyc files
+
+open env variables in pc
+
+click on New under User variables
+
+in variable name put PYTHONDONTWRITEBYTECODE
+
+and in variable value put 1
+
+click on ok and restart Vscode
