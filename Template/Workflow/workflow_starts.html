@@ -130,7 +130,7 @@
                                                      '{{ item.editORcreate }}')">
                             {{ item.user_prev_step_name }}
                           </button>
-                        {% elif item.editORcreate in '23' %}
+                          {% elif item.editORcreate == 2 or item.editORcreate == 3 %}
                           <button class="btn btn-primary btn-sm"
                                   onclick="startStepEdit('{{ item.form_data_id }}',
                                                          '{{ item.req_num }}',
