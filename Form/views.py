@@ -1168,7 +1168,7 @@ def form_master(request):
         messages.error(request, 'Oops...! Something went wrong!')
         return JsonResponse({"error": "Something went wrong!"}, status=500)
     
-@login_required
+
 def common_form_post(request):
     user = request.session.get('user_id', '')
     user_name = request.session.get('username', '')
