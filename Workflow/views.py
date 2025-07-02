@@ -284,6 +284,7 @@ def download_xls(request):
     finally:
         return response
     
+@login_required
 def workflow_starts(request):  
     Db.closeConnection()
     m = Db.get_connection()

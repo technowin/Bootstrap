@@ -75,7 +75,7 @@ def get_dublicate_name(request):
         return JsonResponse({'exists': exists})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-
+@login_required
 def form_builder(request):
     user  = request.session.get('user_id', '')
     try:
@@ -193,7 +193,7 @@ def format_label(label):
 
 
 
-@csrf_exempt
+@login_required
 def save_form(request):
     user  = request.session.get('user_id', '')
     try:
@@ -355,7 +355,7 @@ def save_form(request):
 
 
 
-@csrf_exempt
+@login_required
 def update_form(request, form_id):
     user = request.session.get('user_id', '')
     try:
@@ -576,7 +576,7 @@ def update_form(request, form_id):
         Db.closeConnection()
 
 
-
+@login_required
 def form_action_builder(request):
     try:
         user  = request.session.get('user_id', '')
@@ -635,7 +635,7 @@ def form_action_builder(request):
         "dropdown_options": json.dumps(dropdown_options),
     })
 
-
+@login_required
 def form_action_builder_master(request):
     user  = request.session.get('user_id', '')
     action_id = request.GET.get('action_id')
@@ -688,7 +688,7 @@ def form_action_builder_master(request):
 
 
 
-@csrf_exempt
+@login_required
 def save_form_action(request):
     user  = request.session.get('user_id', '')
     try:
@@ -758,7 +758,7 @@ def save_form_action(request):
     finally:
         Db.closeConnection()
 
-@csrf_exempt
+@login_required
 def update_action_form(request, form_id):
     user  = request.session.get('user_id', '')
     try:  # Decoding action_id if necessary
@@ -839,7 +839,7 @@ def update_action_form(request, form_id):
     finally:
         Db.closeConnection()
 
-
+@login_required
 def form_master(request):
     user  = request.session.get('user_id', '')
     try:
@@ -1168,7 +1168,7 @@ def form_master(request):
         messages.error(request, 'Oops...! Something went wrong!')
         return JsonResponse({"error": "Something went wrong!"}, status=500)
     
-
+@login_required
 def common_form_post(request):
     user = request.session.get('user_id', '')
     user_name = request.session.get('username', '')
@@ -1509,7 +1509,7 @@ def common_form_post(request):
         else:
             return redirect('/masters?entity=form_master&type=i')
 
-
+@login_required
 def common_form_edit(request):
 
     user = request.session.get('user_id', '')
@@ -2087,7 +2087,7 @@ def handle_uploaded_files(request, form_name, created_by, form_data, user):
         messages.error(request, "Oops...! Something went wrong!")
 
     
-
+@login_required
 def form_preview(request):
     user  = request.session.get('user_id', '')
     id = request.GET.get("id")
@@ -2181,7 +2181,7 @@ def form_preview(request):
 
     
 
-
+@login_required
 def common_form_action(request):
     user = request.session.get('user_id', '')
     workflow_YN = request.POST.get("workflow_YN")
@@ -2386,7 +2386,7 @@ def common_form_action(request):
         return JsonResponse({"error": "Something went wrong!"}, status=500)
 
 
-
+@login_required
 def download_file(request):
     try:
         encrypted_path = request.GET.get('file')
@@ -2439,7 +2439,7 @@ def download_file(request):
 #             traceback.print_exc()
 #             return JsonResponse({"success": False, "error": "Could not delete file"}, status=500)
 #     return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
-
+@login_required
 def delete_file(request):
     if request.method == "POST":
         try:
@@ -2473,7 +2473,7 @@ def delete_file(request):
 
 
 
-
+@login_required
 def get_uploaded_files(request):
     try:
         field_id = request.POST.get("field_id")
@@ -2538,7 +2538,8 @@ def get_query_data(request):
             return JsonResponse(data, safe=False)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
-        
+
+@login_required 
 def check_field_before_delete(request):
     if request.method == "POST":
         field_id = request.POST.get("field_id")
@@ -2586,6 +2587,7 @@ def create_new_section(request):
             return JsonResponse({"id": section.id, "name": section.name})
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+@login_required
 def reference_workflow(request):
     user = request.session.get('user_id', '')
     try:
@@ -2753,6 +2755,7 @@ def handle_uploaded_files_temp(request, form_name, created_by, matched_form_data
         traceback.print_exc()
         messages.error(request, "Oops...! Something went wrong!")
 
+@login_required
 def get_compare_data(request, final_id):
     user  = request.session.get('user_id', '')
     try:
