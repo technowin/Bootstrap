@@ -23,6 +23,8 @@
 
 <link href="{% static 'css/inputs.css' %}" rel="stylesheet" type="text/css" >
 
+<link href="{% static 'css/app-checkbox-css.css' %}" rel="stylesheet" type="text/css" >
+
 <!-- Selectize.js CSS -->
 <link href="{% static 'css/selectize.min.css' %}" rel="stylesheet" type="text/css" >
 <link href="{% static 'css/form_builder.css' %}" rel="stylesheet" type="text/css" >
@@ -46,13 +48,13 @@
                     {% csrf_token %}
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <label>Form Action Name:</label>
+                            <label  class="form-label">Form Action Name:</label>
                             <input type="text" placeholder="Enter Action Template Name" class="form-control"
                                 name="action_name" value="{{ form.name }}" required>
                         </div>
 
                         <div class="col-md-3">
-                            <label>Master Actions</label>
+                            <label class="form-label">Master Actions</label>
                             <select name="action_master" id="dropdown" class="form-control">
                                 <option value="">Select</option>
                                 {% for item in master_values %}
@@ -63,11 +65,11 @@
 
                         <div class="col-md-2 d-flex align-items-center justify-content-center">
                             <div>
-                                <label for="add_into_master">Add to Master</label><br>
+                                <label class="form-label" for="add_into_master">Add to Master</label><br>
                                 <label class="switch">
-                                    <input type="checkbox" name="is_master" id="add_into_master"
+                                    <input type="checkbox" name="is_master" class="form-control salary-checkbox" id="add_into_master"
                                         {% if form.is_master == True %}checked{% endif %}>
-                                    <span class="slider"></span>
+                                    {% comment %} <span class="slider"></span> {% endcomment %}
                                 </label>
                             </div>
                         </div>
@@ -87,7 +89,7 @@
                 <div class="text-center mb-3">
                     <h5 class="fw-bold text-dark">
                         {% if form %}Edit{% else %}Create{% endif %} Form Footer
-                        <button class="btn btn-primary ms-3" onclick="addField(event)">Add Field</button>
+                        <button class="btn btn-success ms-3 rounded-pill" onclick="addField(event)">Add Field</button>
                     </h5>
                 </div>
 
