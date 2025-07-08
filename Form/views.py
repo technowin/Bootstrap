@@ -2663,6 +2663,8 @@ def reference_workflow(request):
                 form_id=file_obj.form.id,
                 field_id=file_obj.field.id,
                 file_path = file_obj.file_path,
+                file_size = file_obj.file_size,
+                num_pages = file_obj.num_pages,
                 uploaded_name=file_obj.uploaded_name,
                 created_by=created_by,
                 updated_by=created_by
@@ -2756,12 +2758,30 @@ def handle_uploaded_files_temp(request, form_name, created_by, matched_form_data
                     for chunk in uploaded_file.chunks():
                         destination.write(chunk)
 
+                # Initialize metadata
+                file_size = None
+                num_pages = None
+                file_size = os.path.getsize(save_path)
+
+                if file_extension.lower() == '.pdf':
+                    try:
+                        # file_size = os.path.getsize(save_path)
+                        with open(save_path, 'rb') as f:
+                            reader = PdfReader(f)
+                            num_pages = len(reader.pages)
+                    except Exception as pdf_err:
+                        print("Error reading PDF:", pdf_err)
+                else:
+                    num_pages = '1'
+
                 form_file_temp = FormFileTemp.objects.create(
                     file_name=saved_file_name,
                     uploaded_name=uploaded_file_name,
                     file_path=relative_file_path,
                     form_data_id=matched_form_data_id,
                     form_id=form_id,  
+                    file_size=file_size,
+                    num_pages=num_pages,
                     created_by=user,
                     updated_by=user,
                     field_id=field_id
