@@ -283,7 +283,7 @@ def download_xls(request):
         messages.error(request, 'Oops...! Something went wrong!')
     finally:
         return response
-    
+
 @login_required
 def workflow_starts(request):  
     Db.closeConnection()

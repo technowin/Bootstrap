@@ -507,8 +507,11 @@
 
 </div>
 
+{% comment %} <div id="popupOverlay" style="display: none; position: fixed; top: 0; left: 0;
+    width: 100vw; height: 30vh; background: rgba(0,0,0,0.3); z-index: 9990;"></div> {% endcomment %}
+
 <div id="popupOverlay" style="display: none; position: fixed; top: 0; left: 0;
-    width: 100vw; height: 30vh; background: rgba(0,0,0,0.3); z-index: 9990;"></div>
+    width: 100vw; height: 30vh; "></div>
 
 {% comment %} ends here {% endcomment %}
 
@@ -889,6 +892,7 @@
                 const popup = document.getElementById('workflowPopup');
                 const overlay = document.getElementById('popupOverlay');
                 const operatorDropdown = document.getElementById('custom_dropdownOpr');
+                
                 const editORcreate = document.getElementById('editORcreate');
                 const categorydropdownDprt = document.getElementById('category_dropdownOpr');
                 const catconfirmSubmitBtn = document.getElementById('catconfirmSubmitBtn');
@@ -903,7 +907,7 @@
                 const reference_type = $('#reference_type').val();
 
                 if (buttonType === 'Submit' && parseInt(workflow_YN.value) === 1 && parseInt(firstStep.value) === 1) {
-                    debugger;
+                    
 
                     e.preventDefault();
 
@@ -916,9 +920,15 @@
                     operatorDropdown.setAttribute('required', true);
 
                     confirmSubmitBtn.onclick = function () {
-                        form.action = "{% url 'common_form_post' %}";
-
+                        debugger;
+                        
+                            form.action = "{% url 'common_form_post' %}";
+                            form.submit(); // Manual submit
+                        
                     };
+
+
+                    
 
                     // Cancel button inside popup
                     cancelPopupBtn.onclick = function () {
