@@ -379,11 +379,13 @@
   <div class="row col-lg-12 mb-2 shadow justify-content-center" style="padding: 10px;text-align:center;border-radius: 15px;margin-left:0px;align-items:center;justify-items:center;">
         <input type="hidden" id="clicked_action_id" name="clicked_action_id">
 
-       <div class="col-md-3" style="">
-            <button type="button" class="btn btn-primary rounded-pill" data-toggle="modal" data-target="#livePreviewModal">
+
+        <div class="col-md-3">
+            <button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#livePreviewModal">
                 Show Actions
             </button>
-        </div>
+            </div>
+
         <div class="col-md-2">
             <a href="{% url 'workflow_starts' %}" class="btn btn-secondary rounded-pill ms-2">Back</a>
         </div>
@@ -507,8 +509,11 @@
 
 </div>
 
+{% comment %} <div id="popupOverlay" style="display: none; position: fixed; top: 0; left: 0;
+    width: 100vw; height: 30vh; background: rgba(0,0,0,0.3); z-index: 9990;"></div> {% endcomment %}
+
 <div id="popupOverlay" style="display: none; position: fixed; top: 0; left: 0;
-    width: 100vw; height: 30vh; background: rgba(0,0,0,0.3); z-index: 9990;"></div>
+    width: 100vw; height: 30vh; "></div>
 
 {% comment %} ends here {% endcomment %}
 
@@ -889,6 +894,7 @@
                 const popup = document.getElementById('workflowPopup');
                 const overlay = document.getElementById('popupOverlay');
                 const operatorDropdown = document.getElementById('custom_dropdownOpr');
+                
                 const editORcreate = document.getElementById('editORcreate');
                 const categorydropdownDprt = document.getElementById('category_dropdownOpr');
                 const catconfirmSubmitBtn = document.getElementById('catconfirmSubmitBtn');
@@ -903,7 +909,7 @@
                 const reference_type = $('#reference_type').val();
 
                 if (buttonType === 'Submit' && parseInt(workflow_YN.value) === 1 && parseInt(firstStep.value) === 1) {
-                    debugger;
+                    
 
                     e.preventDefault();
 
@@ -916,9 +922,15 @@
                     operatorDropdown.setAttribute('required', true);
 
                     confirmSubmitBtn.onclick = function () {
-                        form.action = "{% url 'common_form_post' %}";
-
+                        debugger;
+                        
+                            form.action = "{% url 'common_form_post' %}";
+                            form.submit(); // Manual submit
+                        
                     };
+
+
+                    
 
                     // Cancel button inside popup
                     cancelPopupBtn.onclick = function () {

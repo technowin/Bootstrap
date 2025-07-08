@@ -34,6 +34,13 @@
 
 {% block content %}
 
+<style>
+    .header{
+        color:white !important;
+        font-size:20px !important
+    }
+</style>
+
       <!-- Statistics Summary -->
 <!-- Statistics Summary -->
 <!-- Top Summary Card -->
@@ -58,29 +65,26 @@
 
 <!-- Comparison Section -->
 <div class="row mb-4">
-    <!-- Old Values Card -->
+    <!-- Previous Values Card -->
     <div class="col-md-6">
-        <div class="card border-start border-primary border-4 shadow-sm h-100">
+        <div class="card border-start border-4 border-primary shadow-sm h-100">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Previous Values</h5>
+                <h5 class="mb-0 header">Previous Values</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     {% for item in comparison_data %}
-                        {% with index=forloop.counter0 %}
                         <div class="col-md-4 mb-3">
                             <label class="form-label">{{ item.label }}</label>
                             <div class="position-relative">
                                 <input type="text"
-                                    class="form-control {% if item.old_value != item.new_value %}border-warning{% endif %}"
-                                    style="{% if item.old_value != item.new_value %}background-color: #fcff33;{% endif %}"
+                                    class="form-control {% if item.old_value != item.new_value %}border-warning bg-warning-subtle text-dark{% endif %}"
                                     value="{{ item.old_value }}"
                                     disabled
                                     data-index="{{ forloop.counter0 }}"
                                     data-type="old">
                             </div>
                         </div>
-                        {% endwith %}
                     {% endfor %}
                 </div>
             </div>
@@ -89,32 +93,28 @@
 
     <!-- New Values Card -->
     <div class="col-md-6">
-        <div class="card border-start border-success border-4 shadow-sm h-100">
+        <div class="card border-start border-4 border-success shadow-sm h-100">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0">New Values</h5>
+                <h5 class="mb-0 header">New Values</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     {% for item in comparison_data %}
-                        {% with index=forloop.counter0 %}
                         <div class="col-md-4 mb-3">
                             <label class="form-label">{{ item.label }}</label>
                             <div class="position-relative">
-                               <input type="text"
-                                    class="form-control {% if item.old_value != item.new_value %}border-warning{% endif %}"
-                                    style="{% if item.old_value != item.new_value %}background-color: #fcff33;{% endif %}"
+                                <input type="text"
+                                    class="form-control {% if item.old_value != item.new_value %}border-warning bg-warning-subtle text-dark{% endif %}"
                                     value="{{ item.new_value }}"
                                     disabled
                                     data-index="{{ forloop.counter0 }}"
                                     data-type="new">
 
-
-                                {% comment %} {% if item.old_value != item.new_value %}
-                                    <span class="position-absolute top-0 end-0 translate-middle badge bg-danger">!</span>
-                                {% endif %} {% endcomment %}
+                                {% if item.old_value != item.new_value %}
+                                    <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger">!</span>
+                                {% endif %}
                             </div>
                         </div>
-                        {% endwith %}
                     {% endfor %}
                 </div>
             </div>
@@ -123,13 +123,14 @@
 </div>
 
 
+
    <div class="row">
     {% for file_item in file_comparison_data %}
         <!-- OLD FILES -->
         <div class="col-md-6 mb-4">
             <div class="card border-start border-primary border-4 shadow-sm h-100">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">{{ file_item.label }} - Old Files</h5>
+                    <h5 class="mb-0 header">{{ file_item.label }} - Old Files</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -145,8 +146,8 @@
                     <!-- Old File Preview Box -->
                     <div id="old-file-preview-container" class="mt-4" style="display: none;">
                         <div class="card shadow-sm">
-                            <div class="card-header bg-dark text-white">
-                                <h5 class="mb-0">File Preview</h5>
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0 header">File Preview</h5>
                             </div>
                             <div class="card-body" style="height: 600px; overflow-y: auto;">
                                 <div id="old-file-preview-content"  style="height: 100%;"></div>
@@ -161,7 +162,7 @@
         <div class="col-md-6 mb-4">
             <div class="card border-start border-success border-4 shadow-sm h-100">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">{{ file_item.label }} - New Files</h5>
+                    <h5 class="mb-0 header">{{ file_item.label }} - New Files</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
@@ -177,8 +178,8 @@
                     <!-- New File Preview Box -->
                     <div id="new-file-preview-container" class="mt-4" style="display: none;">
                         <div class="card shadow-sm">
-                            <div class="card-header bg-dark text-white">
-                                <h5 class="mb-0">File Preview</h5>
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0 header">File Preview</h5>
                             </div>
                             <div class="card-body" style="height: 600px; overflow-y: auto;">
                                 <div id="new-file-preview-content" style="height: 100%;"></div>
@@ -196,7 +197,7 @@
     <div class="col-md-6 mb-4">
         <div class="card border-start border-primary border-4 shadow-sm h-100">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">{{ file_item.label }} Old Data (Previous Version)</h5>
+                <h5 class="mb-0 header">{{ file_item.label }} Old Data (Previous Version)</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -239,7 +240,7 @@
     <div class="col-md-6 mb-4">
         <div class="card border-start border-success border-4 shadow-sm h-100">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0">{{ file_item.label }} New Data (Latest Version)</h5>
+                <h5 class="mb-0 header">{{ file_item.label }} New Data (Latest Version)</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
