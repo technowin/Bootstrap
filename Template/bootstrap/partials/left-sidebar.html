@@ -1,24 +1,29 @@
+
+
 {% load static i18n %}
+
+{% load custom_filters %}
+
 <!-- ========== Left Sidebar Start ========== -->
 <div class="leftside-menu">
 
     <!-- Brand Logo Light -->
     <a href="{% url 'dashboard:index' %}" class="logo logo-light">
-        <span class="logo-lg">
-            <img src="{% static 'images/logo.png' %}" alt="logo">
+        <span class="logo-lg" style="color:white !important;font-weight:bold">
+            <img src="{% static 'images/technologo2.png' %}" alt="logo">&nbsp;&nbsp;Technowin
         </span>
         <span class="logo-sm">
-            <img src="{% static 'images/logo-sm.png' %}" alt="small logo">
+            <img src="{% static 'images/technologo2.png' %}" alt="small logo">
         </span>
     </a>
 
     <!-- Brand Logo Dark -->
     <a href="{% url 'dashboard:index' %}" class="logo logo-dark">
-        <span class="logo-lg">
-            <img src="{% static 'images/logo-dark.png' %}" alt="dark logo">
+        <span class="logo-lg" style="color:black !important;font-weight:bold">
+            <img src="{% static 'images/technologo1.png' %}" alt="dark logo">&nbsp;&nbsp;Technowin
         </span>
         <span class="logo-sm">
-            <img src="{% static 'images/logo-dark-sm.png' %}" alt="small logo">
+            <img src="{% static 'images/technologo1.png' %}" alt="small logo">
         </span>
     </a>
 
@@ -37,17 +42,90 @@
         <!-- Leftbar User -->
         <div class="leftbar-user">
             <a href="{% url 'pages:profile' %}">
-                <img src="{% static 'images/users/avatar-1.jpg' %}" alt="user-image" height="42"
+                <img src="{% static 'img/user.png' %}" alt="user-image" height="42"
                      class="rounded-circle shadow-sm">
-                <span class="leftbar-user-name mt-2">Dominic Keller</span>
+                <span class="leftbar-user-name mt-2">{{ full_name }}</span>
             </a>
         </div>
 
         <!--- Sidemenu -->
         <ul class="side-nav">
-
+            
             <li class="side-nav-title">Navigation</li>
-
+            {% for item in menu_items %}
+                <li class="side-nav-item">
+                    {% if not item.is_parent %}
+                        <!-- Single level menu item -->
+                        <a class="side-nav-link" href="{{ item.action }}">
+                            <i class="{{ item.menu_icon }}"></i>
+                            {% if item.badge %}
+                                <span class="badge bg-success float-end">{{ item.badge }}</span>
+                            {% endif %}
+                            <span>{{ item.name }}</span>
+                        </a>
+                    {% else %}
+                        <!-- Parent menu item with children -->
+                        <a data-bs-toggle="collapse" href="#sidebarMenu_{{ item.id }}" aria-expanded="false"
+                           aria-controls="sidebarMenu_{{ item.id }}" class="side-nav-link">
+                            <i class="{{ item.menu_icon }}"></i>
+                            <span>{{ item.name }}</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="sidebarMenu_{{ item.id }}">
+                            <ul class="side-nav-second-level">
+                                {% for child in item.children %}
+                                    {% if not child.is_sub_menu %}
+                                        <!-- Second level simple item -->
+                                        <li>
+                                            <a href="{{ child.action }}">{{ child.name }}</a>
+                                        </li>
+                                    {% else %}
+                                        <!-- Second level with submenu -->
+                                        <li class="side-nav-item">
+                                            <a data-bs-toggle="collapse" href="#sidebarSubMenu_{{ child.id }}" 
+                                               aria-expanded="false" aria-controls="sidebarSubMenu_{{ child.id }}">
+                                                <span>{{ child.name }}</span>
+                                                <span class="menu-arrow"></span>
+                                            </a>
+                                            <div class="collapse" id="sidebarSubMenu_{{ child.id }}">
+                                                <ul class="side-nav-third-level">
+                                                    {% for sub_child in child.children %}
+                                                        {% if not sub_child.is_sub_menu2 %}
+                                                            <!-- Third level simple item -->
+                                                            <li>
+                                                                <a href="{{ sub_child.action }}">{{ sub_child.name }}</a>
+                                                            </li>
+                                                        {% else %}
+                                                            <!-- Third level with submenu -->
+                                                            <li class="side-nav-item">
+                                                                <a data-bs-toggle="collapse" href="#sidebarSubMenu2_{{ sub_child.id }}" 
+                                                                   aria-expanded="false" aria-controls="sidebarSubMenu2_{{ sub_child.id }}">
+                                                                    <span>{{ sub_child.name }}</span>
+                                                                    <span class="menu-arrow"></span>
+                                                                </a>
+                                                                <div class="collapse" id="sidebarSubMenu2_{{ sub_child.id }}">
+                                                                    <ul class="side-nav-forth-level">
+                                                                        {% for sub_sub_child in sub_child.children %}
+                                                                            <li>
+                                                                                <a href="{{ sub_sub_child.action }}">{{ sub_sub_child.name }}</a>
+                                                                            </li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                </div>
+                                                            </li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            <li class="side-nav-title">Bootstrap 5 Templates</li>
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarDashboards" aria-expanded="false"
                    aria-controls="sidebarDashboards" class="side-nav-link">
@@ -75,88 +153,6 @@
                     </ul>
                 </div>
             </li>    
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarMaster" aria-expanded="false"
-                   aria-controls="sidebarMaster" class="side-nav-link">
-                    <i class="uil-copy-alt"></i>
-                    <span> Master </span>
-                </a>
-                <div class="collapse" id="sidebarMaster">
-                    <ul class="side-nav-second-level">
-                        <li>
-                            <a href="/masters?entity=form&amp;type=i">Form Generator</a>
-                        </li>
-                        <li>
-                            <a href="/masters?entity=action&amp;type=i">Form Action Generator</a>
-                        </li>
-                        <li>
-                            <a href="/masters/?entity=form_master&amp;type=i">Form Master</a>
-                        </li>
-                        <li>
-                            <a href="/masters?entity=wfseq&amp;type=i">workflow Matrix</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-        
-            <li class="side-nav-item">
-                <a class="side-nav-link" href="/workflow_starts">
-                    <i class="uil-cube"></i>
-                    <span>workflow starts</span>
-                </a>
-            </li>
-        
-    
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarComponents" aria-expanded="false"
-                   aria-controls="sidebarComponents" class="side-nav-link">
-                    <i class="uil-cog"></i>
-                    <span> Components </span>
-                </a>
-                <div class="collapse" id="sidebarComponents">
-                    <ul class="side-nav-second-level">
-                        <li>
-                            <a href="/masters?entity=user&amp;type=i">Create User</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-    
-            <li class="side-nav-item">
-                <a class="side-nav-link" href="/common_html">
-                    <i class="uil-table"></i>
-                    <span>Reports</span>
-                </a>
-            </li>
-        
-    
-        
-            <li class="side-nav-item">
-                <a class="side-nav-link" href="/search">
-                    <i class="uil-search-alt"></i>
-                    <span>Search File</span>
-                </a>
-            </li>
-        
-    
-        
-            <li class="side-nav-item">
-                <a class="side-nav-link" href="/upload">
-                    <i class="uil-upload"></i>
-                    <span>OCR Upload</span>
-                </a>
-            </li>
-        
-    
-        
-            <li class="side-nav-item">
-                <a class="side-nav-link" href="/menu_admin?entity=menu&amp;type=i">
-                    <i class="uil-wrench"></i>
-                    <span>Menu Manager</span>
-                </a>
-            </li>
                     
             <li class="side-nav-title">Apps</li>
 

@@ -34,161 +34,175 @@
 {% block content %}
 
 <style>
-    .keywords-container {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
+ .pdf-viewer-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+.search-panel {
+    background-color: var(--ct-body-bg);
+    padding: 1rem;
+    border-bottom: 1px solid var(--ct-border-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.keyword-section,
+.search-section {
+    flex: 1;
+    min-width: 300px;
+}
+
+.keyword-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.625rem;
+}
+
+.keyword-btn {
+    padding: 0.375rem 0.625rem;
+    background-color: var(--ct-secondary-bg);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: var(--ct-body-color);
+    border-radius: 10px!important ; 
+    border: 1px solid grey!important ;
+}
+
+.keyword-btn:hover {
+    background-color: var(--ct-tertiary-bg);
+}
+
+.keyword-btn .match-count {
+    margin-left: 0.3125rem;
+    color: var(--ct-secondary-color);
+    font-size: 0.8em;
+}
+
+.search-box {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.625rem;
+}
+
+.search-box input[type="text"] {
+    flex: 1;
+    padding: 0.5rem;
+    {% comment %} border: 1px solid grey!important ; {% endcomment %}
+    {% comment %} border-radius: 0.375rem; {% endcomment %}
+    background-color: var(--ct-body-bg);
+    color: var(--ct-body-color);
+}
+
+{% comment %} .search-box button {
+    padding: 0.5rem 0.9375rem;
+    background-color: var(--ct-success);
+    color: #fff;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+} {% endcomment %}
+
+{% comment %} .search-box button:hover {
+    background-color: var(--ct-success-dark);
+} {% endcomment %}
+
+.search-options {
+    margin-top: 0.625rem;
+    display: flex;
+    gap: 0.9375rem;
+}
+
+.search-nav {
+    margin-top: 0.625rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.search-nav button {
+    padding: 0.375rem 0.625rem;
+    background-color: var(--ct-primary);
+    color: #fff;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.search-nav button:hover {
+    background-color: var(--ct-primary-dark, #0b5ed7);
+}
+
+.search-nav button:disabled {
+    background-color: var(--ct-secondary);
+    cursor: not-allowed;
+}
+
+.pdf-container {
+    flex: 1;
+    height: calc(100% - 150px);
+    width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-panel {
+        flex-direction: column;
     }
-    
-    .keyword-btn {
-        transition: all 0.2s;
+
+    .keyword-section,
+    .search-section {
+        min-width: 100%;
     }
-    
-    .keyword-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    
-    .keyword-btn.active {
-        {% comment %} background-color: #007bff; {% endcomment %}
-        color: white;
-        box-shadow: 0 2px 8px rgba(0,123,255,0.4);
-    }
-    
-    .pdf-viewer-container {
-        position: relative;
-        overflow: hidden;
-        background-color: #525659; /* PDF.js background color */
-    }
-    
-    .search-results {
-        {% comment %} background-color: #f8f9fa; {% endcomment %}
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid grey;
-    }
-    
-    #pdf-viewer {
-        width: 100%;
-    }
-    
-    .highlight {
-        background-color: rgba(255, 255, 0, 0.5);
-        border-radius: 2px;
-    }
-    
-    .highlight.active {
-        background-color: rgba(255, 215, 0, 0.8);
-        box-shadow: 0 0 2px 1px rgba(0,0,0,0.3);
-    }
+}
+
 </style>
 
-<div class="container-fluid mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">PDF Viewer with Keyword Search</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Keywords Panel -->
-                        <div class="col-md-4 border-right">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="mb-0">Keywords</h5>
-                                <div class="input-group input-group-sm" style="width: 200px;">
-                                    <input type="text" id="keyword-filter" class="form-control" placeholder="Filter keywords...">
-                                    <button class="btn btn-outline-secondary" type="button">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="keywords-container mb-3" style="max-height: 400px; overflow-y: auto;">
-                                {% for keyword in keywords %}
-                                    <button class="btn btn-primary btn-sm keyword-btn mb-2 me-2" data-keyword="{{ keyword }}">
-                                        {{ keyword }} 
-                                        <span class="badge badge-light ml-1 keyword-count" style="display: none;">0</span>
-                                    </button>
-                                {% endfor %}
-                            </div>
-                            <hr>
-                            <div class="search-controls">
-                                <div class="input-group mb-3">
-                                    <input type="text" id="custom-search" class="form-control" placeholder="Search for any text...">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" id="search-btn" type="button">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="search-results d-none">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span id="match-count">0 matches</span>
-                                        <div>
-                                            <button class="btn btn-sm btn-secondary" id="prev-match" disabled>
-                                                <i class="fas fa-chevron-up"></i> Previous
-                                            </button>
-                                            <button class="btn btn-sm btn-secondary" id="next-match" disabled>
-                                                Next <i class="fas fa-chevron-down"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="highlight-all" checked>
-                                        <label class="form-check-label" for="highlight-all">
-                                            Highlight all matches
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="case-sensitive">
-                                        <label class="form-check-label" for="case-sensitive">
-                                            Case sensitive
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="whole-word">
-                                        <label class="form-check-label" for="whole-word">
-                                            Whole words only
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- PDF Viewer -->
-                        <div class="col-md-8">
-                            <div class="pdf-viewer-container shadow-sm border">
-                                    <div id="pdf-viewer" style="height: 600px; overflow-y: auto;"></div>
-                            </div>
-                            <div class="pdf-controls mt-2 d-flex justify-content-between align-items-center">
-                                <div>
-                                    <button class="btn btn-sm btn-secondary" id="prev-page">
-                                        <i class="fas fa-arrow-left"></i> Previous
-                                    </button>
-                                    <span class="mx-2">
-                                        Page <span id="page-num">1</span> of <span id="page-count">0</span>
-                                    </span>
-                                    <button class="btn btn-sm btn-secondary" id="next-page">
-                                        Next <i class="fas fa-arrow-right"></i>
-                                    </button>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-secondary" id="zoom-out">
-                                        <i class="fas fa-search-minus"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-secondary" id="zoom-in">
-                                        <i class="fas fa-search-plus"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-primary" id="download-pdf">
-                                        <i class="fas fa-download"></i> Download
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+<div class="pdf-viewer-container card shadow" style="border-radius: 15px;">
+    <!-- Search Panel -->
+    <div class="search-panel">
+        <div class="keyword-section">
+            <h3>Keywords</h3>
+            <div class="keyword-buttons">
+                {% for keyword in keywords %}
+                <button class="keyword-btn btn-primary" data-keyword="{{ keyword }}">
+                    {{ keyword }} <span class="match-count"></span>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="search-section">
+            <h3>Search PDF</h3>
+            <div class="search-box d-flex gap-2">
+                <input type="text" id="search-input" class="form-control" placeholder="Search...">
+                <button id="search-btn" class="btn btn-primary rounded-pill">Search</button>
+            </div>
+            <div class="search-nav">
+                
+                <span id="match-info">0 matches</span>&nbsp;&nbsp;
+                <button id="prev-match" class="btn btn-secondary" style="display:none;" disabled>Previous</button>
+                <button id="next-match" class="btn btn-secondary" style="display:none;" disabled>Next</button>
+                &nbsp;&nbsp;
+                 <div class="search-options">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="case-sensitive">
+                        <label class="form-check-label p-1" for="case-sensitive">Case sensitive</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="whole-word">
+                        <label class="form-check-label p-1" for="whole-word">Whole word</label>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <!-- PDF Viewer -->
+    <div class="pdf-container">
+        <iframe id="pdf-iframe" src="{{ pdfjs_url }}?file={{ full_path|urlencode }}" frameborder="0" width="100%" height="100%"></iframe>
     </div>
 </div>
 
@@ -211,430 +225,207 @@
     <script src="{% static 'js/selectize.min.js' %}"></script>
 
 {% endblock %}
+
 <!-- PDF.js libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-<script>
-    // Set the worker path
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+<script type="module" src="{% static 'pdfjs/build/pdf.mjs' %}"></script>
+<script type="module" src="{% static 'pdfjs/web/viewer.mjs' %}"></script>
+
+
+<script type="module">
+  document.addEventListener('DOMContentLoaded', function() {
+    const pdfIframe = document.getElementById('pdf-iframe');
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const prevMatchBtn = document.getElementById('prev-match');
+    const nextMatchBtn = document.getElementById('next-match');
+    const matchInfo = document.getElementById('match-info');
+    const caseSensitive = document.getElementById('case-sensitive');
+    const wholeWord = document.getElementById('whole-word');
+    const keywordButtons = document.querySelectorAll('.keyword-btn');
     
-    $(document).ready(function() {
-        // Initialize PDF viewer
-        const pdfViewer = document.getElementById('pdf-viewer');
-        let pdfDoc = null,
-            pageNum = 1,
-            pageRendering = false,
-            pageNumPending = null,
-            scale = 1.5,
-            canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d'),
-            currentSearch = '',
-            currentMatches = [],
-            currentMatchIndex = 0,
-            searchActive = false;
+    let pdfApp = null;
+    let findController = null;
+    let currentSearchQuery = '';
+    let currentMatchIndex = 0;
+    let totalMatches = 0;
+
+    // Initialize PDF.js viewer
+    pdfIframe.addEventListener('load', function() {
+        pdfApp = pdfIframe.contentWindow.PDFViewerApplication;
         
-        pdfViewer.appendChild(canvas);
-        
-        // Load the PDF
-        function loadPdf() {
-            const url = "{{ full_path }}";
+        pdfApp.initializedPromise.then(function() {
+            console.log('PDF viewer fully initialized');
+            findController = pdfApp.findController;
             
-            // Load the PDF
-            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page-count').textContent = pdfDoc.numPages;
-                
-                // Initial page rendering
-                renderPage(pageNum);
-                
-                // Update keyword counts
-                updateKeywordCounts();
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                alert('Error loading PDF. Please try again.');
+            // Set up event listeners for search results
+            pdfApp.eventBus.on('updatefindmatchescount', function(evt) {
+                totalMatches = evt.matchesCount.total;
+                updateMatchInfo();
             });
-        }
-        
-        // Render a page
-        function renderPage(num) {
-            pageRendering = true;
             
-            // Using promise to fetch the page
-            pdfDoc.getPage(num).then(function(page) {
-                const viewport = page.getViewport({ scale: scale });
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                // Render PDF page into canvas context
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: viewport
-                };
-                
-                const renderTask = page.render(renderContext);
-                
-                // Wait for rendering to finish
-                renderTask.promise.then(function() {
-                    pageRendering = false;
-                    document.getElementById('page-num').textContent = num;
-                    
-                    if (pageNumPending !== null) {
-                        // New page rendering is pending
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
-                    
-                    // Highlight search terms if any
-                    if (currentSearch) {
-                        highlightText(currentSearch);
-                    }
-                });
-            });
-        }
-        
-        // Queue rendering of a page
-        function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
-            }
-        }
-        
-        // Previous page
-        document.getElementById('prev-page').addEventListener('click', function() {
-            if (pageNum <= 1) {
-                return;
-            }
-            pageNum--;
-            queueRenderPage(pageNum);
-        });
-        
-        // Next page
-        document.getElementById('next-page').addEventListener('click', function() {
-            if (pageNum >= pdfDoc.numPages) {
-                return;
-            }
-            pageNum++;
-            queueRenderPage(pageNum);
-        });
-        
-        // Zoom in
-        document.getElementById('zoom-in').addEventListener('click', function() {
-            scale += 0.25;
-            queueRenderPage(pageNum);
-        });
-        
-        // Zoom out
-        document.getElementById('zoom-out').addEventListener('click', function() {
-            if (scale <= 0.5) {
-                return;
-            }
-            scale -= 0.25;
-            queueRenderPage(pageNum);
-        });
-        
-        // Download PDF
-        document.getElementById('download-pdf').addEventListener('click', function() {
-            window.open("{{ full_path }}", '_blank');
-        });
-        
-        // Keyword search
-        $('.keyword-btn').click(function() {
-            const keyword = $(this).data('keyword');
-            performSearch(keyword);
-            
-            // Update active state
-            $('.keyword-btn').removeClass('active');
-            $(this).addClass('active');
-        });
-        
-        // Custom search
-        $('#search-btn').click(function() {
-            const searchText = $('#custom-search').val().trim();
-            if (searchText) {
-                performSearch(searchText);
-            }
-        });
-        
-        // Custom search on Enter key
-        $('#custom-search').keypress(function(e) {
-            if (e.which === 13) {
-                $('#search-btn').click();
-            }
-        });
-        
-        // Filter keywords
-        $('#keyword-filter').keyup(function() {
-            const filter = $(this).val().toLowerCase();
-            $('.keyword-btn').each(function() {
-                const keyword = $(this).data('keyword').toLowerCase();
-                if (keyword.includes(filter)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
+            pdfApp.eventBus.on('updatefindcontrolstate', function(evt) {
+                if (evt.state === '') return;
+                if (evt.result && evt.result.matches) {
+                    currentMatchIndex = evt.result.matches.current;
+                    totalMatches = evt.result.matches.total;
+                    updateMatchInfo();
                 }
             });
+            
+            // Initialize search functions
+            setupSearchHandlers();
+        }).catch(function(error) {
+            console.error('PDF initialization failed:', error);
         });
-        
-        // Previous match
-        $('#prev-match').click(function() {
-            if (currentMatchIndex > 0) {
-                currentMatchIndex--;
-                navigateToMatch();
-            }
-        });
-        
-        // Next match
-        $('#next-match').click(function() {
-            if (currentMatchIndex < currentMatches.length - 1) {
-                currentMatchIndex++;
-                navigateToMatch();
-            }
-        });
-        
-        // Perform search
-        function performSearch(searchText) {
-            currentSearch = searchText;
-            $('#custom-search').val(searchText);
-            $('.search-results').removeClass('d-none');
-            
-            // Highlight the text on current page
-            highlightText(searchText);
-            
-            // Search through the entire document to get match count
-            searchDocument(searchText).then(function(matches) {
-                currentMatches = matches;
-                updateMatchUI();
-            });
-        }
-        
-        // Highlight text on current page
-        function highlightText(searchText) {
-            if (!pdfDoc || !searchText) return;
-            
-            // Get current page
-            pdfDoc.getPage(pageNum).then(function(page) {
-                page.getTextContent().then(function(textContent) {
-                    // Clear previous highlights
-                    const highlights = document.querySelectorAll('.highlight');
-                    highlights.forEach(highlight => {
-                        highlight.parentNode.replaceChild(
-                            document.createTextNode(highlight.textContent),
-                            highlight
-                        );
-                    });
-                    
-                    // Search for the text
-                    const searchStr = searchText;
-                    const caseSensitive = $('#case-sensitive').is(':checked');
-                    const wholeWord = $('#whole-word').is(':checked');
-                    
-                    let searchRegex;
-                    if (wholeWord) {
-                        searchRegex = new RegExp(`\\b${escapeRegExp(searchStr)}\\b`, caseSensitive ? 'g' : 'gi');
-                    } else {
-                        searchRegex = new RegExp(escapeRegExp(searchStr), caseSensitive ? 'g' : 'gi');
-                    }
-                    
-                    const viewport = page.getViewport({ scale: scale });
-                    const textItems = textContent.items;
-                    const textDivs = [];
-                    
-                    // Find matches and highlight them
-                    for (let i = 0; i < textItems.length; i++) {
-                        const textItem = textItems[i];
-                        const matches = [...textItem.str.matchAll(searchRegex)];
-                        
-                        if (matches.length > 0) {
-                            const text = textItem.str;
-                            let lastIndex = 0;
-                            let highlightedText = '';
-                            
-                            for (const match of matches) {
-                                const before = text.substring(lastIndex, match.index);
-                                const matched = text.substring(match.index, match.index + match[0].length);
-                                
-                                highlightedText += before + `<span class="highlight">${matched}</span>`;
-                                lastIndex = match.index + match[0].length;
-                            }
-                            
-                            highlightedText += text.substring(lastIndex);
-                            
-                            // Create a div for this text item
-                            const textDiv = document.createElement('div');
-                            textDiv.style.position = 'absolute';
-                            textDiv.style.left = `${textItem.transform[4]}px`;
-                            textDiv.style.top = `${textItem.transform[5]}px`;
-                            textDiv.style.fontSize = `${textItem.height}px`;
-                            textDiv.style.lineHeight = `${textItem.height}px`;
-                            textDiv.style.transform = `matrix(${textItem.transform[0]}, ${textItem.transform[1]}, ${textItem.transform[2]}, ${textItem.transform[3]}, 0, 0)`;
-                            textDiv.innerHTML = highlightedText;
-                            
-                            textDivs.push(textDiv);
-                        }
-                    }
-                    
-                    // Add highlights to the canvas
-                    const highlightLayer = document.createElement('div');
-                    highlightLayer.style.position = 'absolute';
-                    highlightLayer.style.left = '0';
-                    highlightLayer.style.top = '0';
-                    highlightLayer.style.width = '100%';
-                    highlightLayer.style.height = '100%';
-                    highlightLayer.style.pointerEvents = 'none';
-                    
-                    textDivs.forEach(div => highlightLayer.appendChild(div));
-                    
-                    // Remove previous highlight layer if exists
-                    const oldLayer = document.querySelector('.highlight-layer');
-                    if (oldLayer) oldLayer.remove();
-                    
-                    highlightLayer.classList.add('highlight-layer');
-                    canvas.parentNode.appendChild(highlightLayer);
-                });
-            });
-        }
-        
-        // Search through the entire document
-        function searchDocument(searchText) {
-            return new Promise((resolve) => {
-                if (!pdfDoc) {
-                    resolve([]);
-                    return;
-                }
-                
-                const matches = [];
-                const promises = [];
-                const caseSensitive = $('#case-sensitive').is(':checked');
-                const wholeWord = $('#whole-word').is(':checked');
-                
-                let searchRegex;
-                if (wholeWord) {
-                    searchRegex = new RegExp(`\\b${escapeRegExp(searchText)}\\b`, caseSensitive ? 'g' : 'gi');
-                } else {
-                    searchRegex = new RegExp(escapeRegExp(searchText), caseSensitive ? 'g' : 'gi');
-                }
-                
-                // Search each page
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
-                    promises.push(
-                        pdfDoc.getPage(i).then(function(page) {
-                            return page.getTextContent().then(function(textContent) {
-                                let pageMatches = 0;
-                                
-                                for (let j = 0; j < textContent.items.length; j++) {
-                                    const textItem = textContent.items[j];
-                                    const textMatches = textItem.str.match(searchRegex);
-                                    
-                                    if (textMatches) {
-                                        pageMatches += textMatches.length;
-                                    }
-                                }
-                                
-                                if (pageMatches > 0) {
-                                    matches.push({
-                                        page: i,
-                                        count: pageMatches
-                                    });
-                                }
-                                
-                                return pageMatches;
-                            });
-                        })
-                    );
-                }
-                
-                Promise.all(promises).then(() => {
-                    resolve(matches);
-                });
-            });
-        }
-        
-        // Update match UI
-        function updateMatchUI() {
-            const totalMatches = currentMatches.reduce((sum, match) => sum + match.count, 0);
-            $('#match-count').text(`${totalMatches} matches`);
-            
-            // Enable/disable navigation buttons
-            $('#prev-match').prop('disabled', currentMatchIndex <= 0);
-            $('#next-match').prop('disabled', currentMatchIndex >= totalMatches - 1);
-            
-            // If we have matches, navigate to the first one
-            if (totalMatches > 0) {
-                currentMatchIndex = 0;
-                navigateToMatch();
-            }
-        }
-        
-        // Navigate to current match
-        function navigateToMatch() {
-            if (currentMatches.length === 0) return;
-            
-            // Find which page contains this match
-            let cumulativeCount = 0;
-            let targetPage = 1;
-            
-            for (const match of currentMatches) {
-                if (currentMatchIndex < cumulativeCount + match.count) {
-                    targetPage = match.page;
-                    break;
-                }
-                cumulativeCount += match.count;
-            }
-            
-            // Go to the page if not already there
-            if (pageNum !== targetPage) {
-                pageNum = targetPage;
-                queueRenderPage(pageNum);
-            }
-            
-            // Highlight the active match (this is simplified - would need more complex logic for exact positioning)
-            setTimeout(() => {
-                const highlights = document.querySelectorAll('.highlight');
-                if (highlights.length > 0) {
-                    // Remove active class from all
-                    highlights.forEach(h => h.classList.remove('active'));
-                    
-                    // Add active class to the current match
-                    const matchIndex = currentMatchIndex - cumulativeCount;
-                    if (matchIndex >= 0 && matchIndex < highlights.length) {
-                        highlights[matchIndex].classList.add('active');
-                        highlights[matchIndex].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                }
-            }, 500);
-        }
-        
-        // Update keyword counts
-        function updateKeywordCounts() {
-            if (!pdfDoc) return;
-            
-            $('.keyword-btn').each(function() {
-                const keyword = $(this).data('keyword');
-                const countElement = $(this).find('.keyword-count');
-                
-                searchDocument(keyword).then(function(matches) {
-                    const total = matches.reduce((sum, match) => sum + match.count, 0);
-                    if (total > 0) {
-                        countElement.text(total).show();
-                    } else {
-                        countElement.hide();
-                    }
-                });
-            });
-        }
-        
-        // Helper function to escape regex special characters
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-        
-        // Initialize
-        loadPdf();
     });
+
+    function performSearch(query, options = {}) {
+    if (!query || !findController) {
+        resetSearch();
+        return;
+    }
+
+    currentSearchQuery = query;
+    currentMatchIndex = 1;
+    totalMatches = 0;
+
+    // Set search parameters
+    findController.caseSensitive = options.caseSensitive || false;
+    findController.entireWord = options.wholeWord || false;
+    findController.highlightAll = true;
+
+    // Reset UI while searching
+    matchInfo.textContent = 'Searching...';
+    prevMatchBtn.disabled = true;
+    nextMatchBtn.disabled = true;
+
+    try {
+        pdfApp.eventBus.dispatch('find', {
+            source: window,
+            type: 'find',
+            query: query,
+            phraseSearch: true,
+            caseSensitive: findController.caseSensitive,
+            entireWord: findController.entireWord,
+            highlightAll: findController.highlightAll
+        });
+
+        // Wait briefly and then scroll to the first match
+        setTimeout(() => {
+            const selected = findController._selected;
+            if (selected && typeof selected.pageIdx !== 'undefined') {
+                pdfApp.pdfViewer.scrollPageIntoView({
+                    pageNumber: selected.pageIdx + 1,
+                });
+            }
+        }, 500); // increase if match loading is slow
+    } catch (error) {
+        console.error('Search failed:', error);
+        matchInfo.textContent = 'Search error';
+    }
+}
+
+
+    function navigateMatch(direction) {
+        if (!findController || !currentSearchQuery) return;
+        
+        try {
+            pdfApp.eventBus.dispatch('findagain', {
+                type: 'findagain',
+                query: currentSearchQuery,
+                phraseSearch: true,
+                findPrevious: direction === 'prev',
+                caseSensitive: findController.caseSensitive,
+                entireWord: findController.entireWord
+            });
+            
+            // Manually update the match index
+            if (direction === 'prev' && currentMatchIndex > 1) {
+                currentMatchIndex--;
+            } else if (direction === 'next' && currentMatchIndex < totalMatches) {
+                currentMatchIndex++;
+            }
+            
+            updateMatchInfo();
+        } catch (error) {
+            console.error('Navigation failed:', error);
+        }
+    }
+
+    function resetSearch() {
+        currentSearchQuery = '';
+        currentMatchIndex = 0;
+        totalMatches = 0;
+        if (findController) {
+            try {
+                pdfApp.eventBus.dispatch('find', {
+                    type: 'find',
+                    query: '',
+                    highlightAll: false
+                });
+            } catch (error) {
+                console.error('Reset search failed:', error);
+            }
+        }
+        updateMatchInfo();
+    }
+
+    function updateMatchInfo() {
+        if (totalMatches > 0) {
+            matchInfo.textContent = `${currentMatchIndex} of ${totalMatches} matches`;
+            prevMatchBtn.disabled = currentMatchIndex <= 1;
+            nextMatchBtn.disabled = currentMatchIndex >= totalMatches;
+        } else if (currentSearchQuery) {
+            matchInfo.textContent = 'No matches found';
+            prevMatchBtn.disabled = true;
+            nextMatchBtn.disabled = true;
+        } else {
+            matchInfo.textContent = 'Ready to search';
+            prevMatchBtn.disabled = true;
+            nextMatchBtn.disabled = true;
+        }
+    }
+
+    function setupSearchHandlers() {
+        // Event listeners
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            performSearch(query, {
+                caseSensitive: caseSensitive.checked,
+                wholeWord: wholeWord.checked
+            });
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+
+        prevMatchBtn.addEventListener('click', function() {
+            navigateMatch('prev');
+        });
+
+        nextMatchBtn.addEventListener('click', function() {
+            navigateMatch('next');
+        });
+
+        // Keyword buttons
+        keywordButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const keyword = this.dataset.keyword;
+                searchInput.value = keyword;
+                performSearch(keyword, {
+                    caseSensitive: caseSensitive.checked,
+                    wholeWord: wholeWord.checked
+                });
+            });
+        });
+
+        // Initial UI state
+        updateMatchInfo();
+    }
+});
 </script>
 
 {% endblock %}

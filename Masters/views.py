@@ -282,9 +282,10 @@ def document_detail(request, document_id):
 def ks(request, document_id):
     document = get_object_or_404(Document, id=document_id)
     keywords = document.keywords.split(',')[:20]  # Top 20
+    keywords = [k.strip() for k in keywords]
     full_path = os.path.join(MEDIA_URL,str(document.pdf_file)).replace('\\', '/')
     return render(request, 'Master/keyword_search.html', {
-        'document': document,'full_path': full_path,'keywords': keywords
+        'document': document,'full_path': full_path,'keywords': keywords, 'pdfjs_url': '/static/pdfjs/web/viewer.html'
     })
 
 @login_required
