@@ -1450,9 +1450,11 @@ def common_form_post(request):
                     match = re.match(r'action_field_(\d+)', key)
                     latest_row = WorkflowVersionControl.objects.filter(file_name=form_data.file_ref).order_by('-id').first()
 
-                    # Set temp_vers based on whether a row was found
-                    if latest_row and latest_row.temp_version is not None:
-                        temp_vers = Decimal(str(latest_row.temp_version))
+                    if role_idC != '5' or role_idC != '6':
+                        if latest_row and latest_row.temp_version is not None:
+                            temp_vers = Decimal(str(latest_row.temp_version))
+                        else:
+                            temp_vers = Decimal('1.0')
                     else:
                         temp_vers = Decimal('1.0')
                     if match:
