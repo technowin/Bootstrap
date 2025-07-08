@@ -1,5 +1,6 @@
 from collections import defaultdict
 from decimal import Decimal
+from PyPDF2 import PdfReader
 from django.db import connection
 from django.shortcuts import render
 
@@ -16,6 +17,7 @@ from Masters.models import *
 from django.db.models import Max
 import Db 
 import bcrypt
+from PyPDF2 import PdfReader
 from django.contrib.auth.decorators import login_required
 from Masters.views import extract_keywords, extract_text_from_pdf
 from hyper.encryption import *
@@ -1383,32 +1385,7 @@ def common_form_post(request):
                     # created_by=workflow_detail.updated_by,
                     created_at=workflow_detail.updated_at
                 )
-            # if role_idC == '2':
-            #     reject_case = WorkflowVersionControl.objects.filter(
-            #     file_name=file_name,
-            #     version_no=0
-            #     ).exists()
-                
-            #     if not reject_case:
-            #         latest_file_category = WorkflowVersionControl.objects.filter(
-            #         file_name=file_name
-            #         ).order_by('-id').values_list('file_category', flat=True).first()
-            #         WorkflowVersionControl.objects.create(
-            #             file_name=file_name,
-            #             version_no=0,
-            #             temp_version = 1.0,
-            #             modified_by=user_name,
-            #             modified_at=now(),
-            #             file_category=latest_file_category if latest_file_category else None,
-            #             form_data_id=form_dataID
-            #             )
             if role_idC == '1':
-                # reject_case = WorkflowVersionControl.objects.filter(
-                #     file_name=file_name,
-                #     version_no=0
-                # ).exists()
-
-                # if not reject_case:
                 latest_record = WorkflowVersionControl.objects.filter(
                     file_name=form_data.file_ref
                 ).order_by('-id').first()
@@ -1765,54 +1742,37 @@ def common_form_edit(request):
                         temp_version = Decimal(str(latest_temp_version)) + Decimal('0.1')
 
                     WorkflowVersion.objects.create(req_id = workflow_detail.req_id, version = temp_version)
-                if role_idC == '2':
-            # Check if any row with version_no=0 exists for the given file_name
-                    reject_case = WorkflowVersionControl.objects.filter(
-                        file_name=file_name,
-                        version_no=0
-                    ).exists()
+            if role_idC == '2':
+                reject_case = WorkflowVersionControl.objects.filter(
+                    file_name=file_name,
+                    version_no=0
+                ).exists()
 
-                    if not reject_case:
-                        latest_record = WorkflowVersionControl.objects.filter(
-                            file_name=file_name
-                        ).order_by('-id').first()
+                if not reject_case:
+                    latest_record = WorkflowVersionControl.objects.filter(
+                        file_name=file_name
+                    ).order_by('-id').first()
 
                         # Determine the file_category and latest temp_version
-                        latest_file_category = latest_record.file_category if latest_record else None
-                        latest_temp_version = latest_record.temp_version if latest_record else None
+                    latest_file_category = latest_record.file_category if latest_record else None
+                    latest_temp_version = latest_record.temp_version if latest_record else None
 
                         # Determine new temp_version
-                        if latest_temp_version is None:
-                            temp_version = Decimal('1.0')
-                        else:
-                            temp_version = Decimal(str(latest_temp_version)) + Decimal('0.1')
+                    if latest_temp_version is None:
+                        temp_version = Decimal('1.0')
+                    else:
+                        temp_version = Decimal(str(latest_temp_version)) + Decimal('0.1')
 
                         # Create the new row
-                        WorkflowVersionControl.objects.create(
-                            file_name=file_name,
-                            version_no=0,
-                            temp_version=temp_version,
-                            modified_by=user_name,
-                            modified_at=now(),
-                            file_category=latest_file_category,
-                            form_data_id=form_data_id
-                        )
-                        # WorkflowVersion.objects.create(req_id = workflow_detail.req_id, version = temp_version)
-                # else:
-                    
-                #     last_row = WorkflowVersionControl.objects.filter(file_name=file_name).order_by('-id').first()
-                #     new_temp_version = round((last_row.temp_version or 0) + 0.1, 1)
-
-                #     WorkflowVersionControl.objects.create(
-                #         file_name=file_name,
-                #         version_no=0,
-                #         temp_version=new_temp_version,
-                #         modified_by=user,
-                #         modified_at=now(),
-                #         file_category=last_row.file_category,
-                #         form_data_id=form_data_id
-                #     )
-
+                    WorkflowVersionControl.objects.create(
+                        file_name=file_name,
+                        version_no=0,
+                        temp_version=temp_version,
+                        modified_by=user_name,
+                        modified_at=now(),
+                        file_category=latest_file_category,
+                        form_data_id=form_data_id
+                    )
                 
 
             if role_idC == '5':
@@ -1837,46 +1797,6 @@ def common_form_edit(request):
                         latest_row.approved_by = user_name
                         latest_row.approved_at = now()
                         latest_row.save()
-    #         if role_idC == '5':
-    #             versions = WorkflowVersionControl.objects.filter(file_name=file_name).order_by('-id')
-    #             count_row = versions.count()
-    #             latest_row = versions.first()
-
-    #             prev_version_no = None
-    #             new_version_no = None
-
-    #             if latest_row and count_row == 1:
-    #                 prev_version_no = latest_row.version_no
-    #                 new_version_no = 1
-    #                 latest_row.version_no = new_version_no
-    #                 latest_row.baseline_date = now()
-    #                 latest_row.approved_by = user
-    #                 latest_row.approved_at = now()
-    #                 latest_row.save()
-
-    #             elif latest_row and count_row > 1:
-    #                 second_latest = versions[1]
-    #                 prev_version_no = latest_row.version_no
-    #                 new_version_no = round(second_latest.version_no + 0.1, 1)
-    #                 latest_row.version_no = new_version_no
-    #                 latest_row.baseline_date = now()
-    #                 latest_row.approved_by = user
-    #                 latest_row.approved_at = now()
-    #                 latest_row.save()
-
-    # # 🔄 Update ActionData table with new version_no for that form_data_id
-    #             if new_version_no is not None:
-    #                 ActionData.objects.filter(form_data_id=form_data_id).update(version=new_version_no)
-
-    #                 # 📝 Insert into WorkflowVersionDetails for tracking
-    #                 WorkflowVersionDetails.objects.create(
-    #                     form_id=form.id,  # If you have it available
-    #                     form_data_id=form_data_id,
-    #                     prev_version=str(prev_version_no),
-    #                     curr_version=str(new_version_no),
-    #                     created_by=str(user),
-    #                     updated_by=str(user)
-    #                 )
             for key, value in request.POST.items():
                 if key.startswith("action_field_") and not key.startswith("action_field_id_"):
                     match = re.match(r'action_field_(\d+)', key)
@@ -1978,9 +1898,122 @@ def handle_generative_fields(form, form_data, created_by):
     return final_value
 
 
+# def handle_uploaded_files(request, form_name, created_by, form_data, user):
+#     try:
+#         user = request.session.get('user_id', '')
+#         for field_key, uploaded_files in request.FILES.lists():
+#             if not field_key.startswith("field_"):
+#                 continue
+
+#             field_id = field_key.split("_")[-1].strip()
+#             field = get_object_or_404(FormField, id=field_id)
+
+#             file_dir = os.path.join(settings.MEDIA_ROOT, form_name, created_by, form_data.req_no)
+#             os.makedirs(file_dir, exist_ok=True)
+#             is_multiple = field.field_type == "file multiple"
+
+#             for uploaded_file in uploaded_files:
+#                 uploaded_file_name = uploaded_file.name.strip()
+#                 original_file_name, file_extension = os.path.splitext(uploaded_file_name)
+#                 timestamp = timezone.now().strftime('%Y%m%d%H%M%S%f')
+#                 saved_file_name = f"{original_file_name}_{timestamp}{file_extension}"
+#                 save_path = os.path.join(file_dir, saved_file_name)
+#                 relative_file_path = os.path.join(form_name, created_by, form_data.req_no, saved_file_name)
+                
+
+#                 if is_multiple:
+#                     # Check if this file name already exists
+#                     existing_file = FormFile.objects.filter(
+#                         form_data=form_data,
+#                         field=field,
+#                         uploaded_name=uploaded_file_name
+#                     ).first()
+
+#                     if existing_file:
+#                         old_file_path = os.path.join(settings.MEDIA_ROOT, existing_file.file_path)
+#                         if os.path.exists(old_file_path):
+#                             os.remove(old_file_path)
+
+#                         with open(save_path, 'wb+') as destination:
+#                             for chunk in uploaded_file.chunks():
+#                                 destination.write(chunk)
+
+#                         existing_file.file_name = saved_file_name
+#                         existing_file.file_path = relative_file_path
+#                         existing_file.updated_by = user
+#                         existing_file.num_pages = num_pages
+#                         existing_file.file_size = file_size
+#                         existing_file.save()
+#                         continue
+
+#                 else:
+#                     # 🔥 Single file logic: Delete old one (if any) for this field + form_data
+#                     existing_files = FormFile.objects.filter(form_data=form_data, field=field)
+#                     for old_file in existing_files:
+#                         old_file_path = os.path.join(settings.MEDIA_ROOT, old_file.file_path)
+#                         if os.path.exists(old_file_path):
+#                             os.remove(old_file_path)
+#                         old_file.delete()
+
+#                 # Save new file
+#                 with open(save_path, 'wb+') as destination:
+#                     for chunk in uploaded_file.chunks():
+#                         destination.write(chunk)
+
+#                 form_file = FormFile.objects.create(
+#                     file_name=saved_file_name,
+#                     uploaded_name=uploaded_file_name,
+#                     file_path=relative_file_path,
+#                     form_data=form_data,
+#                     form=form_data.form,
+#                     file_size=file_size,
+#                     num_pages= num_pages,
+#                     created_by=user,
+#                     updated_by=user,
+#                     field=field
+#                 )
+
+#                 form_field_value = FormFieldValues.objects.filter(
+#                     form_id=form_data.form.id,
+#                     field_id=field.id,
+#                     form_data = form_data
+#                 ).first()
+
+#                 if form_field_value:
+#                     if form_field_value.value:
+#                         existing_ids = [x.strip() for x in form_field_value.value.split(',') if x.strip()]
+#                         new_id_str = str(form_file.id)
+#                         if new_id_str not in existing_ids:
+#                             existing_ids.append(new_id_str)
+#                         form_field_value.value = ','.join(existing_ids)
+#                     else:
+#                         form_field_value.value = str(form_file.id)
+#                     form_field_value.save()
+
+#                     form_file.file_id = form_field_value.id
+#                     form_file.save()
+
+
+#                 # OCR + Keyword extraction
+#                 # text = extract_text_from_pdf(os.path.join(MEDIA_ROOT,relative_file_path))
+#                 # keywords = extract_keywords(text)
+#                 # ocr_doc = Document.objects.create(
+#                 #     title=saved_file_name,
+#                 #     pdf_file=relative_file_path,
+#                 #     extracted_text=text,
+#                 #     keywords=', '.join(keywords)
+#                 # ) 
+
+
+
+#     except Exception as e:
+#         traceback.print_exc()
+#         messages.error(request, "Oops...! Something went wrong!")
+
 def handle_uploaded_files(request, form_name, created_by, form_data, user):
     try:
         user = request.session.get('user_id', '')
+        
         for field_key, uploaded_files in request.FILES.lists():
             if not field_key.startswith("field_"):
                 continue
@@ -1990,7 +2023,6 @@ def handle_uploaded_files(request, form_name, created_by, form_data, user):
 
             file_dir = os.path.join(settings.MEDIA_ROOT, form_name, created_by, form_data.req_no)
             os.makedirs(file_dir, exist_ok=True)
-
             is_multiple = field.field_type == "file multiple"
 
             for uploaded_file in uploaded_files:
@@ -2000,6 +2032,27 @@ def handle_uploaded_files(request, form_name, created_by, form_data, user):
                 saved_file_name = f"{original_file_name}_{timestamp}{file_extension}"
                 save_path = os.path.join(file_dir, saved_file_name)
                 relative_file_path = os.path.join(form_name, created_by, form_data.req_no, saved_file_name)
+
+                # First save the file to disk
+                with open(save_path, 'wb+') as destination:
+                    for chunk in uploaded_file.chunks():
+                        destination.write(chunk)
+
+                # Initialize metadata
+                file_size = None
+                num_pages = None
+                file_size = os.path.getsize(save_path)
+
+                if file_extension.lower() == '.pdf':
+                    try:
+                        # file_size = os.path.getsize(save_path)
+                        with open(save_path, 'rb') as f:
+                            reader = PdfReader(f)
+                            num_pages = len(reader.pages)
+                    except Exception as pdf_err:
+                        print("Error reading PDF:", pdf_err)
+                else:
+                    num_pages = '1'
 
                 if is_multiple:
                     # Check if this file name already exists
@@ -2014,18 +2067,16 @@ def handle_uploaded_files(request, form_name, created_by, form_data, user):
                         if os.path.exists(old_file_path):
                             os.remove(old_file_path)
 
-                        with open(save_path, 'wb+') as destination:
-                            for chunk in uploaded_file.chunks():
-                                destination.write(chunk)
-
                         existing_file.file_name = saved_file_name
                         existing_file.file_path = relative_file_path
                         existing_file.updated_by = user
+                        existing_file.num_pages = num_pages
+                        existing_file.file_size = file_size
                         existing_file.save()
                         continue
 
                 else:
-                    # 🔥 Single file logic: Delete old one (if any) for this field + form_data
+                    # Single file logic: Delete old one (if any) for this field + form_data
                     existing_files = FormFile.objects.filter(form_data=form_data, field=field)
                     for old_file in existing_files:
                         old_file_path = os.path.join(settings.MEDIA_ROOT, old_file.file_path)
@@ -2033,17 +2084,15 @@ def handle_uploaded_files(request, form_name, created_by, form_data, user):
                             os.remove(old_file_path)
                         old_file.delete()
 
-                # Save new file
-                with open(save_path, 'wb+') as destination:
-                    for chunk in uploaded_file.chunks():
-                        destination.write(chunk)
-
+                # Save new FormFile object
                 form_file = FormFile.objects.create(
                     file_name=saved_file_name,
                     uploaded_name=uploaded_file_name,
                     file_path=relative_file_path,
                     form_data=form_data,
                     form=form_data.form,
+                    file_size=file_size,
+                    num_pages=num_pages,
                     created_by=user,
                     updated_by=user,
                     field=field
@@ -2052,7 +2101,7 @@ def handle_uploaded_files(request, form_name, created_by, form_data, user):
                 form_field_value = FormFieldValues.objects.filter(
                     form_id=form_data.form.id,
                     field_id=field.id,
-                    form_data = form_data
+                    form_data=form_data
                 ).first()
 
                 if form_field_value:
@@ -2068,19 +2117,6 @@ def handle_uploaded_files(request, form_name, created_by, form_data, user):
 
                     form_file.file_id = form_field_value.id
                     form_file.save()
-
-
-                # OCR + Keyword extraction
-                # text = extract_text_from_pdf(os.path.join(MEDIA_ROOT,relative_file_path))
-                # keywords = extract_keywords(text)
-                # ocr_doc = Document.objects.create(
-                #     title=saved_file_name,
-                #     pdf_file=relative_file_path,
-                #     extracted_text=text,
-                #     keywords=', '.join(keywords)
-                # ) 
-
-
 
     except Exception as e:
         traceback.print_exc()
@@ -2915,22 +2951,6 @@ def check_fileNameExistsInVersion(request):
         ).order_by('-id').exists()
         
         return JsonResponse({'status': 1 if exists else 0})        
-
-# def check_file_status(request):
-#     file_name = request.POST.get('file_name')
-#     if file_name == 'New File':
-#         return JsonResponse({"status": 0})
-
-#     if not file_name:
-#         return JsonResponse({"status": 0, "error": "Missing file_name"})
-
-#     latest_entry = VersionControlFileMap.objects.filter(file_name=file_name).order_by('-id').first()
-
-#     if latest_entry and latest_entry.status == 1:
-#         return JsonResponse({"status": 1})
-#     else:
-#         return JsonResponse({"status": 0})
-
 
 def get_grouped_comments(version_no, form_data_id):
     try:

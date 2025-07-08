@@ -379,11 +379,13 @@
   <div class="row col-lg-12 mb-2 shadow justify-content-center" style="padding: 10px;text-align:center;border-radius: 15px;margin-left:0px;align-items:center;justify-items:center;">
         <input type="hidden" id="clicked_action_id" name="clicked_action_id">
 
-       <div class="col-md-3" style="">
-            <button type="button" class="btn btn-primary rounded-pill" data-toggle="modal" data-target="#livePreviewModal">
+
+        <div class="col-md-3">
+            <button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#livePreviewModal">
                 Show Actions
             </button>
-        </div>
+            </div>
+
         <div class="col-md-2">
             <a href="{% url 'workflow_starts' %}" class="btn btn-secondary rounded-pill ms-2">Back</a>
         </div>
