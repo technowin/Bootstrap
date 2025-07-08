@@ -1607,6 +1607,8 @@ def common_form_edit(request):
                         form=file.form,
                         file_name= file.file_name,
                         form_data=file.form_data,
+                        file_size = file.file_size,
+                        num_pages = file.num_pages,
                         file = file.file,
                         field=file.field,
                         file_path=file.file_path,
