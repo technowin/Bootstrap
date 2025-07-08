@@ -1,4 +1,5 @@
 from django.conf import settings
+from Account.models import roles
 from hyper.encryption import dec
 import Db
 from .db_utils import callproc
@@ -11,6 +12,7 @@ def logged_in_user(request):
     full_name = request.session.get('full_name', '')
     user_id = request.session.get('user_id', '')
     role_id = request.session.get('role_id', '')
+    role_name = ''
     if request.user.is_authenticated ==True:
         user = str(request.user.id or '')
     reports = ''    
@@ -32,6 +34,8 @@ def logged_in_user(request):
         #     menu_dict[item['parent_id']].append(item)
 
         # menu_items = menu_dict.get(-1, []) 
+        role_obj = roles.objects.get(id=role_id)
+        role_name = role_obj.role_name
         menu_items = []
         menu_data = callproc("stp_get_side_navbar_details", [user_id, role_id])
         items = []
@@ -58,4 +62,4 @@ def logged_in_user(request):
         # Get top level items (parent_id = -1 or your specific root indicator)
         menu_items = [item for item in items if item['parent_id'] == -1]
 
-    return {'username':username,'full_name':full_name,'session_timeout_minutes':session_timeout_minutes,'reports':reports, 'menu_items': menu_items}
+    return {'username':username,'full_name':full_name,'role_name':role_name,'session_timeout_minutes':session_timeout_minutes,'reports':reports, 'menu_items': menu_items}
