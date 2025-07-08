@@ -179,9 +179,6 @@ def upload_document(request):
     return render(request, 'Master/upload.html')
 
 
-
-from django.shortcuts import get_object_or_404
-
 def document_detail1(request, pk):
     document = get_object_or_404(Document, pk=pk)
     return render(request, 'Master/document_detail.html', {'document': document})
