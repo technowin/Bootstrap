@@ -158,6 +158,8 @@ class FormFile(models.Model):
     file_name = models.TextField(null=True, blank=True)
     uploaded_name = models.TextField(null=True, blank=True)
     file_path = models.TextField(null=True, blank=True)
+    file_size = models.TextField(null=True,blank=True)
+    num_pages = models.TextField(null=True,blank=True)
     file = models.ForeignKey('Form.FormFieldValues',null=True, blank=True, on_delete=models.CASCADE, related_name='file_id')
     form = models.ForeignKey('Form.Form',null=True, blank=True, on_delete=models.CASCADE, related_name='form_filr_id')
     field = models.ForeignKey('Form.FormField',null=True, blank=True,  on_delete=models.CASCADE, related_name='field_file_id')
