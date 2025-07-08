@@ -30,6 +30,9 @@ ALLOWED_HOSTS = ['15.207.169.98']
 DEBUG = False
 # DEBUG = True   
 
+import mimetypes
+mimetypes.add_type("application/javascript", ".mjs")
+
 DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.mysql',
